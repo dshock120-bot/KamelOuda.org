@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>تسجيل الدخول</title><style>
+body {
+    background: #d9e8fa;
+    font-family: Arial;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    margin: 0;
+}
+
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+}
+
+h2 {
+    color: #287A38;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin: 15px 0;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: #287A38;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
+
+#error {
+    color: red;
+    font-size: 14px;
+}
+</style></head><body><div class="box"><h2>تسجيل الدخول</h2><p>أدخل بريدك الإلكتروني وكلمة المرور للمتابعة</p><form id="loginForm"><input
+type="email"
+id="email"
+placeholder="البريد الإلكتروني"
+required
+
+«»
+
+<input
+type="password"
+id="password"
+placeholder="كلمة المرور"
+required
+
+«»
+
+<button type="submit" id="loginButton">دخول</button>
+
+</form><p id="error"></p></div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script><script>
+const client = new Appwrite.Client();
+
+client
+    .setEndpoint("https://fra.cloud.appwrite.io/v1")
+    .setProject("6afdd0d200116344a36e");
+
+const account = new Appwrite.Account(client);
+
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    const errorBox = document.getElementById("error");
+    const button = document.getElementById("loginButton");
+
+    errorBox.textContent = "";
+
+    if (email !== "teacher@gmail.com") {
+        errorBox.textContent = "هذا البريد الإلكتروني غير مسموح له بالدخول.";
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "جارٍ تسجيل الدخول...";
+
+    try {
+        await account.createEmailPasswordSession({
+            email: email,
+            password: password
+        });
+
+        location.href = "add.html";
+
+    } catch (error) {
+        errorBox.textContent = "تعذر تسجيل الدخول. تأكد من البريد الإلكتروني وكلمة المرور.";
+        button.disabled = false;
+        button.textContent = "دخول";
+        console.error(error);
+    }
+
+});
+</script></body>
+</html>
