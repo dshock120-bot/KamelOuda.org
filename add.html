@@ -110,10 +110,14 @@ const TABLE_ID = "6afe0a6f0007a901c6a1";
 const BUCKET_ID = "6afe111c0001ca2d1d32";
 
 // التأكد من تسجيل الدخول
-if (!isLoggedIn()) {
-  alert("يجب تسجيل الدخول أولاً");
-  location.href = "login.html";
-}
+(async function () {
+  const loggedIn = await isLoggedIn();
+
+  if (!loggedIn) {
+    alert("يجب تسجيل الدخول أولاً");
+    location.href = "login.html";
+  }
+})();
 
 // إنشاء المشروع
 async function saveProject() {
