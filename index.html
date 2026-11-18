@@ -20,6 +20,14 @@
   </a>
 
 </center>
+<script>
+const client = new Appwrite.Client()
+  .setEndpoint("https://fra.cloud.appwrite.io/v1")
+  .setProject("6afe09ed0002aa765acb");
 
+client.ping()
+  .then(() => console.log("Appwrite Connected!"))
+  .catch(error => console.error(error));
+</script>
   </body>
 </html>
