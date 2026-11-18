@@ -122,7 +122,7 @@ const BUCKET_ID = "6afe111c0001ca2d1d32";
 // إنشاء المشروع
 async function saveProject() {
 
-  if (!isLoggedIn()) {
+  if (!(await isLoggedIn())) {
     alert("غير مسموح لك بإضافة المشاريع");
     location.href = "login.html";
     return;
