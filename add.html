@@ -98,11 +98,10 @@ label {
 </div><script src="auth.js"></script><script>
 
 const client = new Appwrite.Client();
-
-client
-  .setEndpoint("https://fra.cloud.appwrite.io/v1")
-  .setProject("6afdd0d200116344a36e");
-
+  client
+.setEndpoint("https://fra.cloud.appwrite.io/v1")
+.setProject("6afdd0d200116344a36e");
+  
 const tablesDB = new Appwrite.TablesDB(client);
 const storage = new Appwrite.Storage(client);
 
