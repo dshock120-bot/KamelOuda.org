@@ -25,9 +25,20 @@ const client = new Appwrite.Client()
   .setEndpoint("https://fra.cloud.appwrite.io/v1")
   .setProject("6afe09ed0002aa765acb");
 
+document.body.insertAdjacentHTML(
+  "beforeend",
+  "<p id='status'>جاري الاتصال بـ Appwrite...</p>"
+);
+
 client.ping()
-  .then(() => console.log("Appwrite Connected!"))
-  .catch(error => console.error(error));
+  .then(() => {
+    document.getElementById("status").innerText =
+      "تم الاتصال بـ Appwrite بنجاح!";
+  })
+  .catch(error => {
+    document.getElementById("status").innerText =
+      "فشل الاتصال: " + error.message;
+  });
 </script>
   </body>
 </html>
