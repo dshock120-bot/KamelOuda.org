@@ -226,14 +226,10 @@ function showProjects() {
 
         card.onclick = function() {
 
-            location.href = "project.html?id=" +
-                encodeURIComponent(project.$id);
+    location.href = "project.html?id=" +
+        encodeURIComponent(project.$id) + "&v=8";
 
-        };
-
-        container.appendChild(card);
-
-    });
+};
 }
 
 // حماية النصوص
