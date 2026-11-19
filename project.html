@@ -1,100 +1,157 @@
-<html>
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
-  <title>تفاصيل المشروع</title>  <style>
-
-    body {
-      background-color: #d9e8fa;
-      font-family: Arial;
-      text-align: center;
-    }
-
-    .container {
-      background-color: white;
-      width: 90%;
-      max-width: 500px;
-      margin: 30px auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-sizing: border-box;
-    }
-
-    .projectImage {
-      width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      border-radius: 10px;
-    }
-
-    h2 {
-      color: #287A38;
-    }
-
-    .details {
-      text-align: right;
-      line-height: 2;
-      font-size: 17px;
-    }
-
-    button {
-      background-color: #287A38;
-      color: white;
-      width: 110px;
-      height: 40px;
-      border: none;
-      border-radius: 6px;
-    }
-
-  </style></head><body><div class="container">  <h2>تفاصيل المشروع</h2>  <div id="projectDetails"></div>  <br>  <button onclick="location.href='list.html'">
-    رجوع
-  </button></div><script>
-
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
-
-let params = new URLSearchParams(location.search);
-
-let id = params.get("id");
-
-let project = projects.find(function(item) {
-  return item.id === id;
-});
-
-let container = document.getElementById("projectDetails");
-
-if (project) {
-
-  let img = document.createElement("img");
-  img.className = "projectImage";
-  img.src = project.image;
-  img.alt = project.name;
-
-  let title = document.createElement("h2");
-  title.textContent = project.name;
-
-  let creator = document.createElement("p");
-  creator.textContent = "اسم المنشئ: " + project.creator;
-
-  let category = document.createElement("p");
-  category.textContent = "الفئة: " + project.category;
-
-  let date = document.createElement("p");
-  date.textContent = "تاريخ العمل: " + (project.date || "غير محدد");
-
-  let details = document.createElement("div");
-  details.className = "details";
-
-  details.appendChild(creator);
-  details.appendChild(category);
-  details.appendChild(date);
-
-  container.appendChild(img);
-  container.appendChild(title);
-  container.appendChild(details);
-
-} else {
-
-  container.textContent = "المشروع غير موجود.";
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل المشروع</title><style>
+body {
+    background-color: #d9e8fa;
+    font-family: Arial;
+    text-align: center;
 }
+
+.container {
+    background-color: white;
+    width: 90%;
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.projectImage {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+h2 {
+    color: #287A38;
+}
+
+.details {
+    text-align: right;
+    line-height: 2;
+    font-size: 17px;
+}
+
+button {
+    background-color: #287A38;
+    color: white;
+    width: 110px;
+    height: 40px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style></head><body><div class="container"><h2>تفاصيل المشروع</h2>
+
+<div id="projectDetails">
+    جاري تحميل المشروع...
+</div>
+
+<br>
+
+<button onclick="location.href='list.html'">
+    رجوع
+</button>
+
+</div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script><script>
+
+// الاتصال بـ Appwrite
+const client = new Appwrite.Client();
+
+client
+    .setEndpoint("https://fra.cloud.appwrite.io/v1")
+    .setProject("6afe09ed0002aa765acb");
+
+const tablesDB = new Appwrite.TablesDB(client);
+
+const DATABASE_ID = "6afe0a5d0038cf5cf776";
+const TABLE_ID = "6afe0a6f0007a901c6a1";
+
+// الحصول على ID المشروع
+const params = new URLSearchParams(location.search);
+const id = params.get("id");
+
+const container = document.getElementById("projectDetails");
+
+// تحميل تفاصيل المشروع
+async function loadProject() {
+
+    if (!id) {
+        container.textContent = "لم يتم تحديد المشروع.";
+        return;
+    }
+
+    try {
+
+        const project = await tablesDB.getRow({
+            databaseId: DATABASE_ID,
+            tableId: TABLE_ID,
+            rowId: id
+        });
+
+        container.innerHTML = "";
+
+        // صورة المشروع
+        if (project.imageUrl) {
+
+            const img = document.createElement("img");
+            img.className = "projectImage";
+            img.src = project.imageUrl;
+            img.alt = project.projectName || "صورة المشروع";
+
+            container.appendChild(img);
+        }
+
+        // اسم المشروع
+        const title = document.createElement("h2");
+        title.textContent = project.projectName || "بدون اسم";
+
+        // التفاصيل
+        const details = document.createElement("div");
+        details.className = "details";
+
+        const creator = document.createElement("p");
+        creator.textContent =
+            "اسم المنشئ: " + (project.creatorName || "غير محدد");
+
+        const category = document.createElement("p");
+        category.textContent =
+            "المادة: " + (project.subject || "غير محددة");
+
+        const grade = document.createElement("p");
+        grade.textContent =
+            "الصف: " + (project.grade || "غير محدد");
+
+        const date = document.createElement("p");
+        date.textContent =
+            "تاريخ العمل: " +
+            (project.projectDate
+                ? project.projectDate.substring(0, 10)
+                : "غير محدد");
+
+        details.appendChild(creator);
+        details.appendChild(category);
+        details.appendChild(grade);
+        details.appendChild(date);
+
+        container.appendChild(title);
+        container.appendChild(details);
+
+    } catch (error) {
+
+        console.error("Appwrite Error:", error);
+
+        container.textContent =
+            "تعذر تحميل المشروع: " +
+            (error.message || "خطأ غير معروف");
+    }
+}
+
+loadProject();
 
 </script></body>
 </html>
