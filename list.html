@@ -129,7 +129,8 @@ oninput="showProjects()"
     <option value="الصف الثالث الثانوي">الثالث الثانوي</option>
 </select>
 
-</div><div id="projects"></div><script src="auth.js"></script><script>
+</div><div id="projects"></div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script>
+<script src="auth.js"></script><script>
 // قراءة المشاريع
 let projects = JSON.parse(localStorage.getItem("projects")) || [];
 
