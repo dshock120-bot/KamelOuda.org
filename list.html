@@ -132,25 +132,107 @@ oninput="showProjects()"
 </div><div id="projects"></div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script>
 <script src="auth.js"></script><script>
 // قراءة المشاريع
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
+// الاتصال بـ Appwrite
+const client = new Appwrite.Client();
 
-// إصلاح المشاريع القديمة التي لا تحتوي على ID
-let changed = false;
+client
+  .setEndpoint("https://fra.cloud.appwrite.io/v1")
+  .setProject("6afe09ed0002aa765acb");
 
-projects.forEach(project => {
-    if (!project.id) {
-        project.id = Date.now().toString() +
-        Math.random().toString(36).slice(2);
-        changed = true;
-    }
-});
+const tablesDB = new Appwrite.TablesDB(client);
 
-if (changed) {
-    localStorage.setItem("projects", JSON.stringify(projects));
+const DATABASE_ID = "6afe0a5d0038cf5cf776";
+const TABLE_ID = "6afe0a6f0007a901c6a1";
+
+let projects = [];
+
+// جلب المشاريع من Appwrite
+async function loadProjects() {
+  const container = document.getElementById("projects");
+
+  container.innerHTML = '<p class="empty">جاري تحميل المشاريع...</p>';
+
+  try {
+    const result = await tablesDB.listRows({
+      databaseId: DATABASE_ID,
+      tableId: TABLE_ID
+    });
+
+    projects = result.rows;
+    showProjects();
+
+  } catch (error) {
+    container.innerHTML =
+      '<p class="empty">تعذر تحميل المشاريع. تحقق من الاتصال والصلاحيات.</p>';
+
+    console.error(error);
+  }
 }
 
 // عرض المشاريع
 function showProjects() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const category = document.getElementById("category").value;
+  const grade = document.getElementById("grade").value;
+
+  const container = document.getElementById("projects");
+  container.innerHTML = "";
+
+  const filtered = projects.filter(project => {
+    const name = (project.projectName || "").toLowerCase();
+    const creator = (project.creatorName || "").toLowerCase();
+
+    return (
+      (name.includes(search) || creator.includes(search)) &&
+      (!category || project.subject === category) &&
+      (!grade || project.grade === grade)
+    );
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML =
+      '<p class="empty">لا توجد مشاريع مطابقة.</p>';
+    return;
+  }
+
+  filtered.forEach(project => {
+    const card = document.createElement("div");
+    card.className = "project";
+
+    const image = project.imageUrl
+      ? `<img src="${escapeHTML(project.imageUrl)}" alt="صورة المشروع">`
+      : "";
+
+    card.innerHTML = `
+      ${image}
+      <h3>${escapeHTML(project.projectName || "")}</h3>
+      <p>المنشئ: ${escapeHTML(project.creatorName || "غير محدد")}</p>
+      <p>المادة: ${escapeHTML(project.subject || "غير محددة")}</p>
+      <p>الصف: ${escapeHTML(project.grade || "غير محدد")}</p>
+    `;
+
+    card.onclick = function() {
+      location.href = "project.html?id=" +
+        encodeURIComponent(project.$id);
+    };
+
+    container.appendChild(card);
+  });
+}
+
+// حماية النصوص
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+// بدء تحميل المشاريع
+loadProjects(); {
 
     let search = document.getElementById("search").value.toLowerCase();
     let category = document.getElementById("category").value;
