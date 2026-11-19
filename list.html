@@ -111,9 +111,7 @@ oninput="showProjects()"
     <option value="قرآن كريم">قرآن كريم</option>
     <option value="دراسات اجتماعية">دراسات اجتماعية</option>
     <option value="تربية فنية">تربية فنية</option>
-</select>
-
-<select id="grade" onchange="showProjects()">
+</select><select id="grade" onchange="showProjects()">
     <option value="">كل الصفوف</option>
     <option value="الصف الأول الابتدائي">الأول الابتدائي</option>
     <option value="الصف الثاني الابتدائي">الثاني الابتدائي</option>
@@ -127,17 +125,14 @@ oninput="showProjects()"
     <option value="الصف الأول الثانوي">الأول الثانوي</option>
     <option value="الصف الثاني الثانوي">الثاني الثانوي</option>
     <option value="الصف الثالث الثانوي">الثالث الثانوي</option>
-</select>
+</select></div><div id="projects"></div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script><script src="auth.js"></script><script>
 
-</div><div id="projects"></div><script src="https://cdn.jsdelivr.net/npm/appwrite@29.0.0"></script>
-<script src="auth.js"></script><script>
-// قراءة المشاريع
 // الاتصال بـ Appwrite
 const client = new Appwrite.Client();
 
 client
-  .setEndpoint("https://fra.cloud.appwrite.io/v1")
-  .setProject("6afe09ed0002aa765acb");
+    .setEndpoint("https://fra.cloud.appwrite.io/v1")
+    .setProject("6afe09ed0002aa765acb");
 
 const tablesDB = new Appwrite.TablesDB(client);
 
@@ -146,146 +141,100 @@ const TABLE_ID = "6afe0a6f0007a901c6a1";
 
 let projects = [];
 
-// جلب المشاريع من Appwrite
+// تحميل المشاريع
 async function loadProjects() {
-  const container = document.getElementById("projects");
 
-  container.innerHTML = '<p class="empty">بدأ تحميل المشاريع من Appwrite...</p>';
-  try {
-    const result = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: TABLE_ID
-    });
+    const container = document.getElementById("projects");
 
-    projects = result.rows;
-    showProjects();
-
-  } catch (error) {
     container.innerHTML =
-      '<p class="empty">تعذر تحميل المشاريع. تحقق من الاتصال والصلاحيات.</p>';
+        '<p class="empty">جاري تحميل المشاريع...</p>';
 
-    console.error(error);
-  }
+    try {
+
+        const result = await tablesDB.listRows({
+            databaseId: DATABASE_ID,
+            tableId: TABLE_ID
+        });
+
+        projects = result.rows;
+
+        showProjects();
+
+    } catch (error) {
+
+        console.error("Appwrite Error:", error);
+
+        container.innerHTML =
+            '<p class="empty">تعذر تحميل المشاريع: ' +
+            escapeHTML(error.message || "خطأ غير معروف") +
+            '</p>';
+    }
 }
 
 // عرض المشاريع
 function showProjects() {
-  const search = document.getElementById("search").value.toLowerCase();
-  const category = document.getElementById("category").value;
-  const grade = document.getElementById("grade").value;
 
-  const container = document.getElementById("projects");
-  container.innerHTML = "";
+    const search = document.getElementById("search").value.toLowerCase();
+    const category = document.getElementById("category").value;
+    const grade = document.getElementById("grade").value;
 
-  const filtered = projects.filter(project => {
-    const name = (project.projectName || "").toLowerCase();
-    const creator = (project.creatorName || "").toLowerCase();
+    const container = document.getElementById("projects");
 
-    return (
-      (name.includes(search) || creator.includes(search)) &&
-      (!category || project.subject === category) &&
-      (!grade || project.grade === grade)
-    );
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML =
-      '<p class="empty">لا توجد مشاريع مطابقة.</p>';
-    return;
-  }
-
-  filtered.forEach(project => {
-    const card = document.createElement("div");
-    card.className = "project";
-
-    const image = project.imageUrl
-      ? `<img src="${escapeHTML(project.imageUrl)}" alt="صورة المشروع">`
-      : "";
-
-    card.innerHTML = `
-      ${image}
-      <h3>${escapeHTML(project.projectName || "")}</h3>
-      <p>المنشئ: ${escapeHTML(project.creatorName || "غير محدد")}</p>
-      <p>المادة: ${escapeHTML(project.subject || "غير محددة")}</p>
-      <p>الصف: ${escapeHTML(project.grade || "غير محدد")}</p>
-    `;
-
-    card.onclick = function() {
-      location.href = "project.html?id=" +
-        encodeURIComponent(project.$id);
-    };
-
-    container.appendChild(card);
-  });
-}
-
-// حماية النصوص
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
-// بدء تحميل المشاريع
-loadProjects(); {
-
-    let search = document.getElementById("search").value.toLowerCase();
-    let category = document.getElementById("category").value;
-    let grade = document.getElementById("grade").value;
-
-    let container = document.getElementById("projects");
     container.innerHTML = "";
 
-    let filtered = projects.filter(project => {
+    const filtered = projects.filter(project => {
 
-        let name = (project.name || "").toLowerCase();
-        let creator = (project.creator || "").toLowerCase();
+        const name = (project.projectName || "").toLowerCase();
+        const creator = (project.creatorName || "").toLowerCase();
 
         return (
             (name.includes(search) || creator.includes(search)) &&
-            (!category || project.category === category) &&
+            (!category || project.subject === category) &&
             (!grade || project.grade === grade)
         );
     });
 
     if (filtered.length === 0) {
+
         container.innerHTML =
-        '<p class="empty">لا توجد مشاريع مطابقة.</p>';
+            '<p class="empty">لا توجد مشاريع مطابقة.</p>';
+
         return;
     }
 
     filtered.forEach(project => {
 
-        let card = document.createElement("div");
+        const card = document.createElement("div");
+
         card.className = "project";
 
-        let image = project.image
-            ? `<img src="${project.image}" alt="صورة المشروع">`
+        const image = project.imageUrl
+            ? `<img src="${escapeHTML(project.imageUrl)}" alt="صورة المشروع">`
             : "";
 
         card.innerHTML = `
             ${image}
-            <h3>${escapeHTML(project.name || "")}</h3>
-            <p>المنشئ: ${escapeHTML(project.creator || "غير محدد")}</p>
-            <p>المادة: ${escapeHTML(project.category || "غير محددة")}</p>
+            <h3>${escapeHTML(project.projectName || "")}</h3>
+            <p>المنشئ: ${escapeHTML(project.creatorName || "غير محدد")}</p>
+            <p>المادة: ${escapeHTML(project.subject || "غير محددة")}</p>
             <p>الصف: ${escapeHTML(project.grade || "غير محدد")}</p>
         `;
 
         card.onclick = function() {
+
             location.href = "project.html?id=" +
-            encodeURIComponent(project.id);
+                encodeURIComponent(project.$id);
+
         };
 
         container.appendChild(card);
+
     });
 }
 
-// حماية النصوص المعروضة
+// حماية النصوص
 function escapeHTML(value) {
+
     return String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
         "<": "&lt;",
@@ -293,8 +242,11 @@ function escapeHTML(value) {
         '"': "&quot;",
         "'": "&#039;"
     })[char]);
+
 }
 
-showProjects();
+// بدء تحميل المشاريع
+loadProjects();
+
 </script></body>
 </html>
