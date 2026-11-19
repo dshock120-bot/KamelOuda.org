@@ -150,8 +150,7 @@ let projects = [];
 async function loadProjects() {
   const container = document.getElementById("projects");
 
-  container.innerHTML = '<p class="empty">جاري تحميل المشاريع...</p>';
-
+  container.innerHTML = '<p class="empty">بدأ تحميل المشاريع من Appwrite...</p>';
   try {
     const result = await tablesDB.listRows({
       databaseId: DATABASE_ID,
