@@ -154,8 +154,7 @@ async function loadProjects() {
         const result = await tablesDB.listRows({
     databaseId: DATABASE_ID,
     tableId: TABLE_ID,
-    queries: [Appwrite.Query.limit(100)]
-});
+        });
         projects = result.rows;
 
         showProjects();
