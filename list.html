@@ -248,5 +248,14 @@ function escapeHTML(value) {
 // بدء تحميل المشاريع
 loadProjects();
 
+const realtime = new Appwrite.Realtime(client);
+
+realtime.subscribe(
+    "tablesdb.6afe0a5d0038cf5cf776.tables.6afe0a6f0007a901c6a1.rows",
+    function(response) {
+        loadProjects();
+    }
+);
+
 </script></body>
 </html>
