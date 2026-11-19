@@ -164,10 +164,14 @@ async function loadProjects() {
 
         console.error("Appwrite Error:", error);
 
-        container.innerHTML =
-            '<p class="empty">تعذر تحميل المشاريع: ' +
-            escapeHTML(error.message || "خطأ غير معروف") +
-            '</p>';
+        container.innerHTML = `
+    <div class="empty">
+        <h3>خطأ Appwrite</h3>
+        <p>${escapeHTML(error.message || "خطأ غير معروف")}</p>
+        <p>Code: ${escapeHTML(error.code || "غير معروف")}</p>
+        <p>Type: ${escapeHTML(error.type || "غير معروف")}</p>
+    </div>
+`;
     }
 }
 
